@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEVIKDA | Dashboard Evaluasi Implementasi Kebijakan Daerah</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230B2545'/%3E%3Cpath d='M7 12.5l3 3 7-7' stroke='%23D4AF37' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['Sora','sans-serif'],
+          sans: ['"Plus Jakarta Sans"','sans-serif'],
+        },
+        colors: {
+          navy: { 950:'#081B33', 900:'#0B2545', 800:'#0F2E54', 700:'#13315C', 600:'#1B3F73' },
+          brand:{ 50:'#EFF6FF', 100:'#DBEAFE', 200:'#BFDBFE', 500:'#3B82F6', 600:'#2563EB', 700:'#1D4ED8' },
+          gold: { 400:'#E2C158', 500:'#D4AF37', 600:'#B8941F' },
+        },
+        boxShadow: {
+          card: '0 1px 2px 0 rgba(15,23,42,0.04), 0 1px 3px 0 rgba(15,23,42,0.06)',
+          soft: '0 8px 24px -8px rgba(11,37,69,0.18)',
+          modal: '0 24px 48px -12px rgba(8,27,51,0.35)',
+        },
+      }
+    }
+  }
+</script>
+<style>
+  html,body{ font-family:'Plus Jakarta Sans', sans-serif; }
+  .font-display{ font-family:'Sora', sans-serif; }
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+  ::-webkit-scrollbar-thumb{ background:#CBD5E1; border-radius:8px; }
+  ::-webkit-scrollbar-thumb:hover{ background:#94A3B8; }
+  .page-section{ animation: fadeIn .25s ease; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+  .shake{ animation: shake .4s ease; }
+  @keyframes shake{ 10%,90%{transform:translateX(-1px);} 20%,80%{transform:translateX(2px);} 30%,50%,70%{transform:translateX(-4px);} 40%,60%{transform:translateX(4px);} }
+  .gov-pattern{
+    background-image:
+      radial-gradient(circle at 18% 22%, rgba(212,175,55,0.18) 0, transparent 40%),
+      radial-gradient(circle at 82% 78%, rgba(59,130,246,0.25) 0, transparent 45%),
+      linear-gradient(160deg, #081B33 0%, #0B2545 38%, #13315C 70%, #1B3F73 100%);
+  }
+  .grid-overlay{
+    background-image: linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 38px 38px;
+  }
+  .sidebar-link.active{ background:rgba(255,255,255,0.10); color:#fff; }
+  .sidebar-link.active .nav-bar{ opacity:1; }
+  .sidebar-link:hover{ background:rgba(255,255,255,0.06); }
+  .toggle-switch{ width:42px; height:24px; }
+  .toggle-dot{ transition: transform .18s ease; }
+  input[type=checkbox]:checked + .toggle-track{ background:#2563EB; }
+  input[type=checkbox]:checked + .toggle-track .toggle-dot{ transform:translateX(18px); }
+  .modal-backdrop{ background:rgba(8,18,33,0.55); backdrop-filter: blur(2px); }
+  .scrollbar-thin::-webkit-scrollbar{ width:6px; }
+  table tbody tr:hover{ background:#F8FAFC; }
+  .toast{ animation: slideUp .25s ease; }
+  @keyframes slideUp{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+<!-- ============ LOGIN VIEW ============ -->
+<div id="loginView" class="min-h-screen w-full flex">
+  <!-- left: brand / illustration panel -->
+  <div class="hidden lg:flex lg:w-1/2 relative gov-pattern overflow-hidden text-white flex-col justify-between p-12">
+    <div class="absolute inset-0 grid-overlay opacity-60"></div>
+    <div class="relative z-10 flex items-center gap-3">
+      <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-500 to-navy-700 ring-1 ring-gold-500/40 flex items-center justify-center shadow-soft">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 12.5l3 3 7-7" stroke="#D4AF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <p class="font-display font-bold tracking-wide text-sm leading-none">SEVIKDA</p>
+        <p class="text-[11px] text-blue-100/70 leading-none mt-1">Sistem Evaluasi Kebijakan Daerah</p>
+      </div>
+    </div>
+
+    <div class="relative z-10 max-w-md">
+      <p class="text-xs font-semibold tracking-[0.2em] text-gold-400 mb-3">MODUL MASTER DATA &middot; BAPPEDA</p>
+      <h1 class="font-display text-4xl font-bold leading-tight mb-4">Satu sistem untuk<br>mengevaluasi setiap<br>kebijakan daerah.</h1>
+      <p class="text-blue-100/80 text-sm leading-relaxed">Kelola data kebijakan, program kerja, dan periode evaluasi secara terpusat, akurat, dan dapat dipertanggungjawabkan.</p>
+    </div>
+
+    <div class="relative z-10 grid grid-cols-3 gap-4">
+      <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+        <p class="font-display text-2xl font-bold">12</p>
+        <p class="text-[11px] text-blue-100/70 mt-1">Kebijakan Tercatat</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+        <p class="font-display text-2xl font-bold">10</p>
+        <p class="text-[11px] text-blue-100/70 mt-1">Periode Evaluasi</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+        <p class="font-display text-2xl font-bold">99.9%</p>
+        <p class="text-[11px] text-blue-100/70 mt-1">Keandalan Sistem</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- right: login form -->
+  <div class="flex-1 flex items-center justify-center bg-white px-6 sm:px-10 py-10">
+    <div class="w-full max-w-sm">
+      <div class="flex lg:hidden items-center gap-3 mb-8">
+        <div class="w-10 h-10 rounded-xl bg-navy-900 flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 12.5l3 3 7-7" stroke="#D4AF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <p class="font-display font-bold text-navy-900 leading-none">SEVIKDA</p>
+          <p class="text-[11px] text-slate-400 leading-none mt-1">Evaluasi Kebijakan Daerah</p>
+        </div>
+      </div>
+
+      <p class="text-xs font-semibold tracking-[0.18em] text-brand-600 mb-2">SELAMAT DATANG</p>
+      <h2 class="font-display text-2xl font-bold text-slate-900 mb-1">Masuk ke akun Anda</h2>
+      <p class="text-sm text-slate-500 mb-8">Gunakan akun resmi Bappeda untuk mengakses modul master data.</p>
+
+      <form id="loginForm" class="space-y-4" autocomplete="off">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Username</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z" stroke="currentColor" stroke-width="1.8"/><path d="M4 20.5c1.4-3.4 4.4-5.5 8-5.5s6.6 2.1 8 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </span>
+            <input id="loginUsername" type="text" placeholder="admin" class="w-full pl-10 pr-4 py-2.75 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500 py-3 transition">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-3 flex items-center text-slate-400">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 1 1 8 0v3" stroke="currentColor" stroke-width="1.8"/></svg>
+            </span>
+            <input id="loginPassword" type="password" placeholder="••••••••" class="w-full pl-10 pr-11 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-500 transition">
+            <button type="button" onclick="togglePassword()" class="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600">
+              <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <p id="loginError" class="hidden text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2"></p>
+
+        <div class="flex items-center justify-between text-sm pt-1">
+          <label class="flex items-center gap-2 text-slate-500 cursor-pointer">
+            <input type="checkbox" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500">
+            Ingat saya
+          </label>
+          <a href="#" onclick="return false;" class="text-brand-600 font-medium hover:underline">Lupa password?</a>
+        </div>
+
+        <button type="submit" class="w-full bg-navy-900 hover:bg-navy-800 text-white font-semibold py-3 rounded-xl shadow-soft transition flex items-center justify-center gap-2">
+          Masuk ke Dashboard
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </form>
+
+      <div class="mt-6 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+        <p class="text-xs font-semibold text-slate-500 mb-2">Akun Demo &mdash; klik untuk isi otomatis</p>
+        <div class="flex gap-2">
+          <button onclick="fillDemo('admin')" class="flex-1 text-xs font-medium px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-brand-400 hover:text-brand-600 transition">Admin (admin / admin123)</button>
+          <button onclick="fillDemo('staff')" class="flex-1 text-xs font-medium px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-brand-400 hover:text-brand-600 transition">Staff (staff / staff123)</button>
+        </div>
+      </div>
+
+      <p class="text-center text-xs text-slate-400 mt-8">&copy; 2026 Badan Perencanaan Pembangunan Daerah &middot; Prototype UAS</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP VIEW ============ -->
+<div id="appView" class="hidden min-h-screen">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-navy-900 text-white flex flex-col z-40 -translate-x-full lg:translate-x-0 transition-transform duration-200">
+    <div class="h-16 flex items-center gap-3 px-5 border-b border-white/10 shrink-0">
+      <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-navy-700 ring-1 ring-gold-500/40 flex items-center justify-center shrink-0">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 12.5l3 3 7-7" stroke="#D4AF37" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="leading-none">
+        <p class="font-display font-bold text-sm">SEVIKDA</p>
+        <p class="text-[10.5px] text-blue-100/60 mt-0.5">Evaluasi Kebijakan Daerah</p>
+      </div>
+      <button onclick="closeSidebar()" class="ml-auto lg:hidden text-blue-100/60 hover:text-white">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+      <p class="px-3 text-[10.5px] font-semibold tracking-[0.16em] text-blue-100/40 mb-2">MENU UTAMA</p>
+
+      <button data-page="dashboard" onclick="showPage('dashboard')" class="sidebar-link active w-full relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-50/85 transition">
+        <span class="nav-bar absolute left-0 top-1.5 bottom-1.5 w-1 rounded-full bg-gold-500 opacity-0"></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 11.5 12 4l9 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Dashboard
+      </button>
+
+      <button data-page="kebijakan" onclick="showPage('kebijakan')" class="sidebar-link w-full relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-50/85 transition">
+        <span class="nav-bar absolute left-0 top-1.5 bottom-1.5 w-1 rounded-full bg-gold-500 opacity-0"></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 11h6M9 14.5h6M9 18h3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Data Kebijakan
+      </button>
+
+      <button data-page="program" onclick="showPage('program')" class="sidebar-link w-full relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-50/85 transition">
+        <span class="nav-bar absolute left-0 top-1.5 bottom-1.5 w-1 rounded-full bg-gold-500 opacity-0"></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 19.5V14M9.5 19.5v-9M15 19.5V9M20 19.5V4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Program Kerja
+      </button>
+
+      <button data-page="periode" onclick="showPage('periode')" class="sidebar-link w-full relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-50/85 transition">
+        <span class="nav-bar absolute left-0 top-1.5 bottom-1.5 w-1 rounded-full bg-gold-500 opacity-0"></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3v3.5M16 3v3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Periode Evaluasi
+      </button>
+
+      <button data-page="pengguna" onclick="showPage('pengguna')" class="sidebar-link w-full relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-50/85 transition">
+        <span class="nav-bar absolute left-0 top-1.5 bottom-1.5 w-1 rounded-full bg-gold-500 opacity-0"></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="17" cy="8.5" r="2.3" stroke="currentColor" stroke-width="1.6"/><path d="M15.8 14.2c2.4.2 4.2 1.9 4.2 4.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Manajemen Pengguna
+      </button>
+
+      <p class="px-3 text-[10.5px] font-semibold tracking-[0.16em] text-blue-100/40 mb-2 mt-5">LAINNYA</p>
+
+      <button data-page="settings" onclick="showPage('settings')" class="sidebar-link w-full relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-50/85 transition">
+        <span class="nav-bar absolute left-0 top-1.5 bottom-1.5 w-1 rounded-full bg-gold-500 opacity-0"></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V20a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.54 14a1.7 1.7 0 0 0-1.55-1.04H2.9a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.55 7.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.06A1.7 1.7 0 0 0 10.5 2H10.6a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1.04 1.56h.06a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V8a1.7 1.7 0 0 0 1.56 1.04h.1a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.56 1.04Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        Pengaturan
+      </button>
+    </nav>
+
+    <div class="p-3 border-t border-white/10 shrink-0">
+      <div class="flex items-center gap-2.5 px-2 py-2.5 rounded-xl bg-white/5 mb-1.5">
+        <div id="sidebarAvatar" class="w-9 h-9 rounded-full bg-gold-500 text-navy-900 font-bold text-xs flex items-center justify-center shrink-0">AF</div>
+        <div class="leading-tight min-w-0">
+          <p id="sidebarUserName" class="text-sm font-semibold truncate">Clarrita Isabella</p>
+          <p id="sidebarUserRole" class="text-[11px] text-blue-100/60 truncate">Admin</p>
+        </div>
+      </div>
+      <button onclick="openLogoutModal()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-50/85 hover:bg-rose-500/15 hover:text-rose-200 transition">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 4.5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 8l4.5 4-4.5 4M20.5 12H9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <div id="sidebarOverlay" onclick="closeSidebar()" class="hidden fixed inset-0 bg-black/40 z-30 lg:hidden"></div>
+
+  <!-- Main column -->
+  <div class="lg:pl-64 min-h-screen flex flex-col">
+    <!-- Topbar -->
+    <header class="h-16 bg-white border-b border-slate-200 flex items-center gap-4 px-4 sm:px-6 sticky top-0 z-20">
+      <button onclick="openSidebar()" class="lg:hidden text-slate-500 hover:text-slate-700">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+      <div class="min-w-0">
+        <h1 id="topbarTitle" class="font-display font-bold text-slate-900 text-base sm:text-lg leading-none truncate">Dashboard</h1>
+        <p id="topbarSubtitle" class="text-xs text-slate-400 mt-1 hidden sm:block">Ringkasan evaluasi implementasi kebijakan daerah</p>
+      </div>
+
+      <div class="ml-auto flex items-center gap-2 sm:gap-4">
+        <button class="relative text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-50">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3.5a5.5 5.5 0 0 0-5.5 5.5v2.6c0 .6-.18 1.18-.52 1.67l-1.1 1.6c-.6.86.02 2.03 1.07 2.03h12.1c1.05 0 1.67-1.17 1.07-2.03l-1.1-1.6a3 3 0 0 1-.52-1.67V9A5.5 5.5 0 0 0 12 3.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9.7 19.5a2.3 2.3 0 0 0 4.6 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+        </button>
+        <div class="w-px h-7 bg-slate-200 hidden sm:block"></div>
+        <div class="flex items-center gap-2.5">
+          <div id="topbarAvatar" class="w-9 h-9 rounded-full bg-navy-900 text-gold-500 font-bold text-xs flex items-center justify-center">AF</div>
+          <div class="leading-tight hidden sm:block">
+            <p id="topbarUserName" class="text-sm font-semibold text-slate-800">Clarrita Isabella</p>
+            <p id="topbarUserRole" class="text-[11px] text-slate-400">Admin</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="flex-1 p-4 sm:p-6 max-w-[1500px] w-full mx-auto">
+
+      <!-- ============ DASHBOARD PAGE ============ -->
+      <section id="sec-dashboard" class="page-section space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-card p-5 border-l-4 border-l-brand-600">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-xs font-medium text-slate-400">Total Kebijakan Aktif</p>
+                <p id="statKebijakan" class="font-display text-3xl font-bold text-slate-900 mt-2">0</p>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 3.5h7l4 4V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 11h6M9 14.5h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <p class="text-xs text-emerald-600 font-medium mt-3 flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M6 11l6-6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Status berjalan saat ini</p>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-card p-5 border-l-4 border-l-gold-500">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-xs font-medium text-slate-400">Total Program Kerja</p>
+                <p id="statProgram" class="font-display text-3xl font-bold text-slate-900 mt-2">0</p>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-amber-50 text-gold-600 flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 19.5V14M9.5 19.5v-9M15 19.5V9M20 19.5V4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400 font-medium mt-3">Tersebar di seluruh kebijakan</p>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-card p-5 border-l-4 border-l-emerald-500">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-xs font-medium text-slate-400">Total Periode Evaluasi</p>
+                <p id="statPeriode" class="font-display text-3xl font-bold text-slate-900 mt-2">0</p>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5" width="17" height="15.5" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17" stroke="currentColor" stroke-width="1.8"/></svg>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400 font-medium mt-3">Semester 1 &amp; 2 tercatat</p>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-card p-5 border-l-4 border-l-navy-700">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-xs font-medium text-slate-400">Total Pengguna</p>
+                <p id="statPengguna" class="font-display text-3xl font-bold text-slate-900 mt-2">0</p>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-slate-100 text-navy-700 flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <p class="text-xs text-slate-400 font-medium mt-3">Admin, Staff &amp; Pimpinan</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-5 gap-4">
+          <div class="xl:col-span-3 bg-white rounded-2xl border border-slate-200 shadow-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="font-display font-bold text-slate-800">Jumlah Kebijakan per Tahun</h3>
+                <p class="text-xs text-slate-400 mt-0.5">Distribusi kebijakan daerah berdasarkan tahun penetapan</p>
+              </div>
+            </div>
+            <div class="h-72"><canvas id="chartYear"></canvas></div>
+          </div>
+          <div class="xl:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-card p-5">
+            <div class="mb-4">
+              <h3 class="font-display font-bold text-slate-800">Status Implementasi</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Proporsi status seluruh kebijakan</p>
+            </div>
+            <div class="h-72"><canvas id="chartStatus"></canvas></div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-card p-5">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-display font-bold text-slate-800">Aktivitas Terbaru</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Riwayat perubahan data pada seluruh modul</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-slate-400 text-xs uppercase tracking-wide border-b border-slate-100">
+                  <th class="py-2.5 pr-4 font-medium">Waktu</th>
+                  <th class="py-2.5 pr-4 font-medium">Pengguna</th>
+                  <th class="py-2.5 pr-4 font-medium">Aktivitas</th>
+                  <th class="py-2.5 pr-4 font-medium">Modul</th>
+                </tr>
+              </thead>
+              <tbody id="activityTableBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ DATA KEBIJAKAN PAGE ============ -->
+      <section id="sec-kebijakan" class="page-section hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-slate-100">
+            <div>
+              <h3 class="font-display font-bold text-slate-800">Data Kebijakan Daerah</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Kelola seluruh kebijakan yang ditetapkan dan dievaluasi</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <input id="searchKebijakan" oninput="renderKebijakanTable()" type="text" placeholder="Cari kebijakan..." class="pl-9 pr-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/40 w-48">
+              </div>
+              <button onclick="openKebijakanModal()" class="flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-card transition whitespace-nowrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+                Tambah Data
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[820px]">
+              <thead class="bg-slate-50">
+                <tr class="text-left text-slate-500 text-xs uppercase tracking-wide">
+                  <th class="py-3 px-5 font-semibold">Kode</th>
+                  <th class="py-3 px-5 font-semibold">Nama Kebijakan</th>
+                  <th class="py-3 px-5 font-semibold">Tahun</th>
+                  <th class="py-3 px-5 font-semibold">Status</th>
+                  <th class="py-3 px-5 font-semibold">Penanggung Jawab</th>
+                  <th class="py-3 px-5 font-semibold text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="kebijakanTableBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+          <div class="px-5 py-3 text-xs text-slate-400 border-t border-slate-100" id="kebijakanCount"></div>
+        </div>
+      </section>
+
+      <!-- ============ PROGRAM KERJA PAGE ============ -->
+      <section id="sec-program" class="page-section hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-slate-100">
+            <div>
+              <h3 class="font-display font-bold text-slate-800">Program Kerja</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Program kerja turunan dari setiap kebijakan daerah</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <input id="searchProgram" oninput="renderProgramTable()" type="text" placeholder="Cari program..." class="pl-9 pr-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/40 w-48">
+              </div>
+              <button onclick="openProgramModal()" class="flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-card transition whitespace-nowrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+                Tambah Data
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[860px]">
+              <thead class="bg-slate-50">
+                <tr class="text-left text-slate-500 text-xs uppercase tracking-wide">
+                  <th class="py-3 px-5 font-semibold">Kode</th>
+                  <th class="py-3 px-5 font-semibold">Nama Program</th>
+                  <th class="py-3 px-5 font-semibold">Kebijakan Terkait</th>
+                  <th class="py-3 px-5 font-semibold">Tahun</th>
+                  <th class="py-3 px-5 font-semibold">Status</th>
+                  <th class="py-3 px-5 font-semibold text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="programTableBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+          <div class="px-5 py-3 text-xs text-slate-400 border-t border-slate-100" id="programCount"></div>
+        </div>
+      </section>
+
+      <!-- ============ PERIODE EVALUASI PAGE ============ -->
+      <section id="sec-periode" class="page-section hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-slate-100">
+            <div>
+              <h3 class="font-display font-bold text-slate-800">Periode Evaluasi</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Jadwal pelaksanaan evaluasi kebijakan per semester</p>
+            </div>
+            <button onclick="openPeriodeModal()" class="flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-card transition whitespace-nowrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+              Tambah Periode
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[760px]">
+              <thead class="bg-slate-50">
+                <tr class="text-left text-slate-500 text-xs uppercase tracking-wide">
+                  <th class="py-3 px-5 font-semibold">Tahun Evaluasi</th>
+                  <th class="py-3 px-5 font-semibold">Semester</th>
+                  <th class="py-3 px-5 font-semibold">Tanggal Mulai</th>
+                  <th class="py-3 px-5 font-semibold">Tanggal Selesai</th>
+                  <th class="py-3 px-5 font-semibold">Status</th>
+                  <th class="py-3 px-5 font-semibold text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="periodeTableBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+          <div class="px-5 py-3 text-xs text-slate-400 border-t border-slate-100" id="periodeCount"></div>
+        </div>
+      </section>
+
+      <!-- ============ MANAJEMEN PENGGUNA PAGE ============ -->
+      <section id="sec-pengguna" class="page-section hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-slate-100">
+            <div>
+              <h3 class="font-display font-bold text-slate-800">Manajemen Pengguna</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Kelola akses pengguna sistem evaluasi kebijakan</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <input id="searchPengguna" oninput="renderPenggunaTable()" type="text" placeholder="Cari pengguna..." class="pl-9 pr-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/40 w-48">
+              </div>
+              <button onclick="openPenggunaModal()" class="flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-card transition whitespace-nowrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+                Tambah User
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[760px]">
+              <thead class="bg-slate-50">
+                <tr class="text-left text-slate-500 text-xs uppercase tracking-wide">
+                  <th class="py-3 px-5 font-semibold">Nama</th>
+                  <th class="py-3 px-5 font-semibold">Email</th>
+                  <th class="py-3 px-5 font-semibold">Role</th>
+                  <th class="py-3 px-5 font-semibold">Status</th>
+                  <th class="py-3 px-5 font-semibold text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="penggunaTableBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+          <div class="px-5 py-3 text-xs text-slate-400 border-t border-slate-100" id="penggunaCount"></div>
+        </div>
+      </section>
+
+      <!-- ============ SETTINGS PAGE ============ -->
+      <section id="sec-settings" class="page-section hidden space-y-5">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="lg:col-span-1 bg-white rounded-2xl border border-slate-200 shadow-card p-6 text-center">
+            <div id="settingsAvatar" class="w-20 h-20 rounded-full bg-navy-900 text-gold-500 font-bold text-2xl flex items-center justify-center mx-auto">AF</div>
+            <p id="settingsName" class="font-display font-bold text-slate-800 mt-4">Clarrita Isabella</p>
+            <p id="settingsEmail" class="text-sm text-slate-400">Clarrita.Isabella@bappeda.go.id</p>
+            <span id="settingsRole" class="inline-block mt-3 text-xs font-semibold px-3 py-1 rounded-full bg-brand-50 text-brand-700">Admin</span>
+          </div>
+
+          <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-card p-6">
+            <h3 class="font-display font-bold text-slate-800 mb-1">Ubah Kata Sandi</h3>
+            <p class="text-xs text-slate-400 mb-5">Perbarui kata sandi akun Anda secara berkala demi keamanan</p>
+            <form onsubmit="event.preventDefault(); showToast('Kata sandi berhasil diperbarui (demo)', 'success'); this.reset();" class="space-y-4 max-w-md">
+              <div>
+                <label class="block text-sm font-medium text-slate-600 mb-1.5">Kata Sandi Saat Ini</label>
+                <input type="password" placeholder="••••••••" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-600 mb-1.5">Kata Sandi Baru</label>
+                <input type="password" placeholder="••••••••" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-600 mb-1.5">Konfirmasi Kata Sandi Baru</label>
+                <input type="password" placeholder="••••••••" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+              </div>
+              <button type="submit" class="bg-navy-900 hover:bg-navy-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition">Simpan Perubahan</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-card p-6">
+          <h3 class="font-display font-bold text-slate-800 mb-1">Preferensi Notifikasi</h3>
+          <p class="text-xs text-slate-400 mb-5">Atur jenis notifikasi yang ingin Anda terima</p>
+          <div class="max-w-md divide-y divide-slate-100">
+            <div class="flex items-center justify-between py-3">
+              <div>
+                <p class="text-sm font-medium text-slate-700">Notifikasi Email</p>
+                <p class="text-xs text-slate-400">Terima ringkasan evaluasi melalui email</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" checked class="sr-only peer">
+                <span class="toggle-track toggle-switch bg-brand-600 rounded-full flex items-center px-0.5 transition">
+                  <span class="toggle-dot w-5 h-5 bg-white rounded-full shadow translate-x-[18px]"></span>
+                </span>
+              </label>
+            </div>
+            <div class="flex items-center justify-between py-3">
+              <div>
+                <p class="text-sm font-medium text-slate-700">Notifikasi Sistem</p>
+                <p class="text-xs text-slate-400">Tampilkan pemberitahuan dalam aplikasi</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" checked class="sr-only peer">
+                <span class="toggle-track toggle-switch bg-brand-600 rounded-full flex items-center px-0.5 transition">
+                  <span class="toggle-dot w-5 h-5 bg-white rounded-full shadow translate-x-[18px]"></span>
+                </span>
+              </label>
+            </div>
+            <div class="flex items-center justify-between py-3">
+              <div>
+                <p class="text-sm font-medium text-slate-700">Pengingat Periode Evaluasi</p>
+                <p class="text-xs text-slate-400">Ingatkan saya 7 hari sebelum periode dimulai</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer">
+                <span class="toggle-track toggle-switch bg-slate-300 rounded-full flex items-center px-0.5 transition">
+                  <span class="toggle-dot w-5 h-5 bg-white rounded-full shadow"></span>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============ MODALS ============ -->
+
+<!-- Modal: Kebijakan -->
+<div id="modal-kebijakan" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-modal w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between p-5 border-b border-slate-100">
+      <h3 id="kebijakanModalTitle" class="font-display font-bold text-slate-800">Tambah Data Kebijakan</h3>
+      <button onclick="closeModal('modal-kebijakan')" class="text-slate-400 hover:text-slate-600"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <form id="formKebijakan" onsubmit="saveKebijakan(event)" class="p-5 space-y-4">
+      <input type="hidden" id="kebijakanEditId">
+      <div>
+        <label class="block text-sm font-medium text-slate-600 mb-1.5">Kode Kebijakan</label>
+        <input id="kebijakanKode" type="text" readonly class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-600 mb-1.5">Nama Kebijakan</label>
+        <input id="kebijakanNama" required type="text" placeholder="Contoh: Peningkatan Kualitas Pendidikan Dasar" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1.5">Tahun</label>
+          <select id="kebijakanTahun" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40"></select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1.5">Status</label>
+          <select id="kebijakanStatus" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+            <option>Berjalan</option><option>Selesai</option><option>Tertunda</option><option>Dibatalkan</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-600 mb-1.5">Penanggung Jawab</label>
+        <select id="kebijakanPic" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+          <option>Dinas Pendidikan</option><option>Dinas Kesehatan</option><option>Dinas Pekerjaan Umum</option>
+          <option>Dinas Komunikasi dan Informatika</option><option>Dinas Sosial</option><option>Dinas Lingkungan Hidup</option>
+          <option>Dinas Perdagangan</option><option>DPMPTSP</option><option>Dinas Pertanian</option>
+          <option>Dinas Pariwisata</option><option>Bappeda</option>
+        </select>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" onclick="closeModal('modal-kebijakan')" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Batal</button>
+        <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-card transition">Simpan Data</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Program -->
+<div id="modal-program" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-modal w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between p-5 border-b border-slate-100">
+      <h3 id="programModalTitle" class="font-display font-bold text-slate-800">Tambah Program Kerja</h3>
+      <button onclick="closeModal('modal-program')" class="text-slate-400 hover:text-slate-600"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <form id="formProgram" onsubmit="saveProgram(event)" class="p-5 space-y-4">
+      <input type="hidden" id="programEditId">
+      <div>
+        <label class="block text-sm font-medium text-slate-600 mb-1.5">Kode Program</label>
+        <input id="programKode" type="text" readonly class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-600 mb-1.5">Nama Program</label>
+        <input id="programNama" required type="text" placeholder="Contoh: Bantuan Operasional Sekolah Daerah" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-600 mb-1.5">Kebijakan Terkait</label>
+        <select id="programKebijakan" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40"></select>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1.5">Tahun</label>
+          <select id="programTahun" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40"></select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1.5">Status</label>
+          <select id="programStatus" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+            <option>Berjalan</option><option>Selesai</option><option>Tertunda</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" onclick="closeModal('modal-program')" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Batal</button>
+        <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-card transition">Simpan Data</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Periode -->
+<div id="modal-periode" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-modal w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between p-5 border-b border-slate-100">
+      <h3 id="periodeModalTitle" class="font-display font-bold text-slate-800">Tambah Periode Evaluasi</h3>
+      <button onclick="closeModal('modal-periode')" class="text-slate-400 hover:text-slate-600"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <form id="formPeriode" onsubmit="savePeriode(event)" class="p-5 space-y-4">
+      <input type="hidden" id="periodeEditId">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1.5">Tahun Evaluasi</label>
+          <select id="periodeTahun" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40"></select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1.5">Semester</label>
+          <select id="periodeSemester" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+            <option value="1">Semester 1</option><option value="2">Semester 2</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1.5">Tanggal Mulai</label>
+          <input id="periodeMulai" type="date" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1.5">Tanggal Selesai</label>
+          <input id="periodeSelesai" type="date" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-600 mb-1.5">Status</label>
+        <select id="periodeStatus" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+          <option>Akan Datang</option><option>Aktif</option><option>Selesai</option>
+        </select>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" onclick="closeModal('modal-periode')" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Batal</button>
+        <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-card transition">Simpan Data</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Pengguna -->
+<div id="modal-pengguna" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-modal w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between p-5 border-b border-slate-100">
+      <h3 id="penggunaModalTitle" class="font-display font-bold text-slate-800">Tambah Pengguna</h3>
+      <button onclick="closeModal('modal-pengguna')" class="text-slate-400 hover:text-slate-600"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <form id="formPengguna" onsubmit="savePengguna(event)" class="p-5 space-y-4">
+      <input type="hidden" id="penggunaEditId">
+      <div>
+        <label class="block text-sm font-medium text-slate-600 mb-1.5">Nama Lengkap</label>
+        <input id="penggunaNama" required type="text" placeholder="Contoh: Clarrita Isabella " class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-600 mb-1.5">Email</label>
+        <input id="penggunaEmail" required type="email" placeholder="nama@bappeda.go.id" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1.5">Role</label>
+          <select id="penggunaRole" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+            <option>Admin</option><option>Staff Bappeda</option><option>Pimpinan</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-600 mb-1.5">Status</label>
+          <select id="penggunaStatus" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/40">
+            <option>Aktif</option><option>Nonaktif</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" onclick="closeModal('modal-pengguna')" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Batal</button>
+        <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-card transition">Simpan Data</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Confirm (delete / toggle / generic) -->
+<div id="modal-confirm" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-modal w-full max-w-sm p-6 text-center">
+    <div id="confirmIconWrap" class="w-14 h-14 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0h10v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    </div>
+    <h3 id="confirmTitle" class="font-display font-bold text-slate-800 mb-1.5">Hapus Data?</h3>
+    <p id="confirmMessage" class="text-sm text-slate-500 mb-6">Tindakan ini tidak dapat dibatalkan.</p>
+    <div class="flex justify-center gap-2">
+      <button onclick="closeModal('modal-confirm')" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Batal</button>
+      <button id="confirmActionBtn" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-card transition">Ya, Hapus</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastRoot" class="fixed bottom-5 right-5 z-[100] space-y-2"></div>
+
+<script>
+/* =========================================================
+   DUMMY DATA
+========================================================= */
+let kebijakanData = [
+  {id:1, kode:'KBJ-001', nama:'Peningkatan Kualitas Pendidikan Dasar', tahun:2022, status:'Berjalan', pic:'Dinas Pendidikan'},
+  {id:2, kode:'KBJ-002', nama:'Pengembangan Infrastruktur Jalan Desa', tahun:2021, status:'Selesai', pic:'Dinas Pekerjaan Umum'},
+  {id:3, kode:'KBJ-003', nama:'Penguatan Sistem Kesehatan Masyarakat', tahun:2023, status:'Berjalan', pic:'Dinas Kesehatan'},
+  {id:4, kode:'KBJ-004', nama:'Digitalisasi Pelayanan Publik', tahun:2023, status:'Berjalan', pic:'Dinas Komunikasi dan Informatika'},
+  {id:5, kode:'KBJ-005', nama:'Pengentasan Kemiskinan Ekstrem', tahun:2022, status:'Tertunda', pic:'Dinas Sosial'},
+  {id:6, kode:'KBJ-006', nama:'Pengelolaan Sampah Berbasis Masyarakat', tahun:2021, status:'Selesai', pic:'Dinas Lingkungan Hidup'},
+  {id:7, kode:'KBJ-007', nama:'Revitalisasi Pasar Tradisional', tahun:2024, status:'Berjalan', pic:'Dinas Perdagangan'},
+  {id:8, kode:'KBJ-008', nama:'Peningkatan Investasi Daerah', tahun:2024, status:'Berjalan', pic:'DPMPTSP'},
+  {id:9, kode:'KBJ-009', nama:'Ketahanan Pangan Daerah', tahun:2023, status:'Berjalan', pic:'Dinas Pertanian'},
+  {id:10, kode:'KBJ-010', nama:'Pengembangan Destinasi Wisata Unggulan', tahun:2022, status:'Selesai', pic:'Dinas Pariwisata'},
+  {id:11, kode:'KBJ-011', nama:'Penurunan Stunting Terintegrasi', tahun:2024, status:'Berjalan', pic:'Dinas Kesehatan'},
+  {id:12, kode:'KBJ-012', nama:'Smart City dan Tata Kelola Data', tahun:2025, status:'Tertunda', pic:'Dinas Komunikasi dan Informatika'},
+];
+let kebijakanSeq = 13;
+
+let programData = [
+  {id:1, kode:'PRG-001', nama:'Bantuan Operasional Sekolah Daerah', kebijakanId:1, tahun:2022, status:'Berjalan'},
+  {id:2, kode:'PRG-002', nama:'Pembangunan Jalan Lingkungan', kebijakanId:2, tahun:2021, status:'Selesai'},
+  {id:3, kode:'PRG-003', nama:'Posyandu Digital Terintegrasi', kebijakanId:3, tahun:2023, status:'Berjalan'},
+  {id:4, kode:'PRG-004', nama:'Sistem Layanan Terpadu Online', kebijakanId:4, tahun:2023, status:'Berjalan'},
+  {id:5, kode:'PRG-005', nama:'Bantuan Sosial Tunai Bersyarat', kebijakanId:5, tahun:2022, status:'Tertunda'},
+  {id:6, kode:'PRG-006', nama:'Bank Sampah Tingkat Kelurahan', kebijakanId:6, tahun:2021, status:'Selesai'},
+  {id:7, kode:'PRG-007', nama:'Renovasi Los dan Kios Pasar', kebijakanId:7, tahun:2024, status:'Berjalan'},
+  {id:8, kode:'PRG-008', nama:'Layanan Investasi Satu Pintu', kebijakanId:8, tahun:2024, status:'Berjalan'},
+  {id:9, kode:'PRG-009', nama:'Lumbung Pangan Tingkat Desa', kebijakanId:9, tahun:2023, status:'Berjalan'},
+  {id:10, kode:'PRG-010', nama:'Festival Wisata Daerah Tahunan', kebijakanId:10, tahun:2022, status:'Selesai'},
+  {id:11, kode:'PRG-011', nama:'Pemberian Makanan Tambahan Balita', kebijakanId:11, tahun:2024, status:'Berjalan'},
+  {id:12, kode:'PRG-012', nama:'Pengembangan Aplikasi Smart City', kebijakanId:12, tahun:2025, status:'Tertunda'},
+];
+let programSeq = 13;
+
+let periodeData = [
+  {id:1, tahun:2021, semester:1, mulai:'2021-01-04', selesai:'2021-06-25', status:'Selesai'},
+  {id:2, tahun:2021, semester:2, mulai:'2021-07-05', selesai:'2021-12-20', status:'Selesai'},
+  {id:3, tahun:2022, semester:1, mulai:'2022-01-03', selesai:'2022-06-24', status:'Selesai'},
+  {id:4, tahun:2022, semester:2, mulai:'2022-07-04', selesai:'2022-12-19', status:'Selesai'},
+  {id:5, tahun:2023, semester:1, mulai:'2023-01-02', selesai:'2023-06-23', status:'Selesai'},
+  {id:6, tahun:2023, semester:2, mulai:'2023-07-03', selesai:'2023-12-18', status:'Selesai'},
+  {id:7, tahun:2024, semester:1, mulai:'2024-01-02', selesai:'2024-06-21', status:'Selesai'},
+  {id:8, tahun:2024, semester:2, mulai:'2024-07-01', selesai:'2024-12-20', status:'Aktif'},
+  {id:9, tahun:2025, semester:1, mulai:'2025-01-06', selesai:'2025-06-27', status:'Akan Datang'},
+  {id:10, tahun:2025, semester:2, mulai:'2025-07-07', selesai:'2025-12-19', status:'Akan Datang'},
+];
+let periodeSeq = 11;
+
+let penggunaData = [
+  {id:1, nama:'Clarrita Isabella', email:'Clarrita.Isabella@bappeda.go.id', role:'Admin', status:'Aktif'},
+  {id:2, nama:'Siti Nurhaliza', email:'siti.nurhaliza@bappeda.go.id', role:'Staff Bappeda', status:'Aktif'},
+  {id:3, nama:'Budi Santoso', email:'budi.santoso@bappeda.go.id', role:'Staff Bappeda', status:'Aktif'},
+  {id:4, nama:'Dewi Lestari', email:'dewi.lestari@pemda.go.id', role:'Pimpinan', status:'Aktif'},
+  {id:5, nama:'Rina Wijaya', email:'rina.wijaya@bappeda.go.id', role:'Staff Bappeda', status:'Nonaktif'},
+  {id:6, nama:'Agus Setiawan', email:'agus.setiawan@bappeda.go.id', role:'Admin', status:'Aktif'},
+  {id:7, nama:'Maya Putri', email:'maya.putri@bappeda.go.id', role:'Staff Bappeda', status:'Aktif'},
+  {id:8, nama:'Hendra Gunawan', email:'hendra.gunawan@pemda.go.id', role:'Pimpinan', status:'Aktif'},
+  {id:9, nama:'Linda Kusuma', email:'linda.kusuma@bappeda.go.id', role:'Staff Bappeda', status:'Aktif'},
+  {id:10, nama:'Joko Prasetyo', email:'joko.prasetyo@bappeda.go.id', role:'Staff Bappeda', status:'Nonaktif'},
+];
+let penggunaSeq = 11;
+
+let activityLog = [
+  {waktu:'08:12', user:'Clarrita isabella', aksi:'Memperbarui status kebijakan KBJ-011 menjadi Berjalan', modul:'Data Kebijakan'},
+  {waktu:'Kemarin', user:'Siti Nurhaliza', aksi:'Menambahkan program kerja PRG-012', modul:'Program Kerja'},
+  {waktu:'Kemarin', user:'Maya Putri', aksi:'Menjadwalkan periode evaluasi semester 2 tahun 2025', modul:'Periode Evaluasi'},
+  {waktu:'2 hari lalu', user:'Agus Setiawan', aksi:'Menonaktifkan akun pengguna Joko Prasetyo', modul:'Manajemen Pengguna'},
+  {waktu:'2 hari lalu', user:'Budi Santoso', aksi:'Mengubah penanggung jawab kebijakan KBJ-007', modul:'Data Kebijakan'},
+  {waktu:'3 hari lalu', user:'Clarrita Isabella', aksi:'Menambahkan kebijakan baru KBJ-012', modul:'Data Kebijakan'},
+  {waktu:'4 hari lalu', user:'Linda Kusuma', aksi:'Memperbarui data program kerja PRG-008', modul:'Program Kerja'},
+  {waktu:'5 hari lalu', user:'Dewi Lestari', aksi:'Meninjau hasil evaluasi semester 1 tahun 2024', modul:'Periode Evaluasi'},
+  {waktu:'1 minggu lalu', user:'Siti Nurhaliza', aksi:'Menambahkan pengguna baru Maya Putri', modul:'Manajemen Pengguna'},
+  {waktu:'1 minggu lalu', user:'Clarrita Isabella', aksi:'Menutup periode evaluasi semester 1 tahun 2024', modul:'Periode Evaluasi'},
+];
+
+const DUMMY_ACCOUNTS = [
+  {username:'admin', password:'admin123', nama:'Clarrita Isabella', email:'clarrita.isabella@bappeda.go.id', role:'Admin'},
+  {username:'staff', password:'staff123', nama:'Siti Nurhaliza', email:'siti.nurhaliza@bappeda.go.id', role:'Staff Bappeda'},
+];
+let currentUser = null;
+let chartYearInstance = null, chartStatusInstance = null;
+let pendingConfirmAction = null;
+
+/* =========================================================
+   HELPERS
+========================================================= */
+function initials(name){
+  return name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+}
+function yearOptionsHTML(selected){
+  let years = [2021,2022,2023,2024,2025,2026];
+  return years.map(y=>`<option value="${y}" ${y===selected?'selected':''}>${y}</option>`).join('');
+}
+function badgeClasses(status){
+  switch(status){
+    case 'Berjalan': case 'Aktif': return 'bg-blue-50 text-blue-700 ring-1 ring-blue-200';
+    case 'Selesai': return 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200';
+    case 'Tertunda': case 'Akan Datang': return 'bg-amber-50 text-amber-700 ring-1 ring-amber-200';
+    case 'Dibatalkan': case 'Nonaktif': return 'bg-rose-50 text-rose-700 ring-1 ring-rose-200';
+    default: return 'bg-slate-100 text-slate-600 ring-1 ring-slate-200';
+  }
+}
+function statusBadge(status){
+  return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClasses(status)}"><span class="w-1.5 h-1.5 rounded-full bg-current"></span>${status}</span>`;
+}
+function formatTanggal(d){
+  if(!d) return '-';
+  const bln=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  const dt=new Date(d+'T00:00:00');
+  return `${dt.getDate()} ${bln[dt.getMonth()]} ${dt.getFullYear()}`;
+}
+const ICON_EDIT = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 17.25V20h2.75L19.81 6.94l-2.75-2.75L4 17.25Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+const ICON_TRASH = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0h10v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+const ICON_TOGGLE = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="8" width="18" height="8" rx="4" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="12" r="2.4" fill="currentColor"/></svg>`;
+
+function actionBtn(icon, color, onclick, title){
+  return `<button onclick="${onclick}" title="${title}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg ${color} transition">${icon}</button>`;
+}
+function showToast(message, type='success'){
+  const colors = type==='success' ? 'bg-emerald-600' : type==='error' ? 'bg-rose-600' : 'bg-navy-900';
+  const icon = type==='success'
+    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 8v5M12 16.5h.01" stroke="white" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.6"/></svg>';
+  const el = document.createElement('div');
+  el.className = `toast ${colors} text-white text-sm font-medium px-4 py-3 rounded-xl shadow-soft flex items-center gap-2.5 min-w-[260px]`;
+  el.innerHTML = `${icon}<span>${message}</span>`;
+  document.getElementById('toastRoot').appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(()=>el.remove(), 300); }, 3000);
+}
+function logActivity(aksi, modul){
+  activityLog.unshift({waktu:'Baru saja', user: currentUser ? currentUser.nama : 'Pengguna', aksi, modul});
+  renderActivityTable();
+}
+function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+
+/* =========================================================
+   AUTH
+========================================================= */
+function togglePassword(){
+  const inp = document.getElementById('loginPassword');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+function fillDemo(type){
+  const acc = DUMMY_ACCOUNTS.find(a=>a.username===type);
+  document.getElementById('loginUsername').value = acc.username;
+  document.getElementById('loginPassword').value = acc.password;
+}
+document.getElementById('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const u = document.getElementById('loginUsername').value.trim();
+  const p = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  const acc = DUMMY_ACCOUNTS.find(a=>a.username===u && a.password===p);
+  if(!acc){
+    errEl.textContent = 'Username atau password salah. Gunakan akun demo di bawah.';
+    errEl.classList.remove('hidden');
+    document.getElementById('loginForm').classList.add('shake');
+    setTimeout(()=>document.getElementById('loginForm').classList.remove('shake'), 400);
+    return;
+  }
+  currentUser = acc;
+  errEl.classList.add('hidden');
+  document.getElementById('loginView').classList.add('hidden');
+  document.getElementById('appView').classList.remove('hidden');
+  applyCurrentUserToUI();
+  renderAll();
+  showPage('dashboard');
+  showToast(`Selamat datang, ${acc.nama.split(' ')[0]}!`, 'success');
+});
+function applyCurrentUserToUI(){
+  const ini = initials(currentUser.nama);
+  ['sidebarAvatar','topbarAvatar','settingsAvatar'].forEach(id=>document.getElementById(id).textContent = ini);
+  document.getElementById('sidebarUserName').textContent = currentUser.nama;
+  document.getElementById('sidebarUserRole').textContent = currentUser.role;
+  document.getElementById('topbarUserName').textContent = currentUser.nama;
+  document.getElementById('topbarUserRole').textContent = currentUser.role;
+  document.getElementById('settingsName').textContent = currentUser.nama;
+  document.getElementById('settingsEmail').textContent = currentUser.email;
+  document.getElementById('settingsRole').textContent = currentUser.role;
+}
+function openLogoutModal(){
+  document.getElementById('confirmIconWrap').className = 'w-14 h-14 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4';
+  document.getElementById('confirmTitle').textContent = 'Keluar dari sistem?';
+  document.getElementById('confirmMessage').textContent = 'Anda akan diarahkan kembali ke halaman login.';
+  const btn = document.getElementById('confirmActionBtn');
+  btn.textContent = 'Ya, Logout';
+  btn.className = 'px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-card transition';
+  pendingConfirmAction = doLogout;
+  openModal('modal-confirm');
+}
+function doLogout(){
+  closeModal('modal-confirm');
+  document.getElementById('appView').classList.add('hidden');
+  document.getElementById('loginView').classList.remove('hidden');
+  document.getElementById('loginForm').reset();
+  document.getElementById('loginError').classList.add('hidden');
+  currentUser = null;
+}
+document.getElementById('confirmActionBtn').addEventListener('click', function(){
+  if(pendingConfirmAction){ pendingConfirmAction(); pendingConfirmAction = null; }
+});
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+const PAGE_META = {
+  dashboard: {title:'Dashboard', sub:'Ringkasan evaluasi implementasi kebijakan daerah'},
+  kebijakan: {title:'Data Kebijakan', sub:'Kelola seluruh kebijakan daerah yang dievaluasi'},
+  program: {title:'Program Kerja', sub:'Program kerja turunan dari setiap kebijakan'},
+  periode: {title:'Periode Evaluasi', sub:'Jadwal pelaksanaan evaluasi per semester'},
+  pengguna: {title:'Manajemen Pengguna', sub:'Kelola akses pengguna sistem'},
+  settings: {title:'Pengaturan', sub:'Profil akun dan preferensi notifikasi'},
+};
+function showPage(page){
+  document.querySelectorAll('.page-section').forEach(s=>s.classList.add('hidden'));
+  document.getElementById('sec-'+page).classList.remove('hidden');
+  document.querySelectorAll('.sidebar-link').forEach(b=>b.classList.toggle('active', b.dataset.page===page));
+  document.getElementById('topbarTitle').textContent = PAGE_META[page].title;
+  const sub = document.getElementById('topbarSubtitle');
+  sub.textContent = PAGE_META[page].sub;
+  sub.classList.remove('hidden');
+  closeSidebar();
+  if(page==='dashboard'){ updateDashboard(); }
+}
+function openSidebar(){
+  document.getElementById('sidebar').classList.remove('-translate-x-full');
+  document.getElementById('sidebarOverlay').classList.remove('hidden');
+}
+function closeSidebar(){
+  if(window.innerWidth < 1024){
+    document.getElementById('sidebar').classList.add('-translate-x-full');
+    document.getElementById('sidebarOverlay').classList.add('hidden');
+  }
+}
+
+/* =========================================================
+   RENDER: KEBIJAKAN
+========================================================= */
+function renderKebijakanTable(){
+  const term = (document.getElementById('searchKebijakan').value || '').toLowerCase();
+  const filtered = kebijakanData.filter(k => k.nama.toLowerCase().includes(term) || k.kode.toLowerCase().includes(term) || k.pic.toLowerCase().includes(term));
+  const tbody = document.getElementById('kebijakanTableBody');
+  tbody.innerHTML = filtered.map(k => `
+    <tr>
+      <td class="py-3.5 px-5 font-mono text-xs font-semibold text-navy-700">${k.kode}</td>
+      <td class="py-3.5 px-5 font-medium text-slate-700">${k.nama}</td>
+      <td class="py-3.5 px-5 text-slate-500">${k.tahun}</td>
+      <td class="py-3.5 px-5">${statusBadge(k.status)}</td>
+      <td class="py-3.5 px-5 text-slate-500">${k.pic}</td>
+      <td class="py-3.5 px-5 text-right space-x-1">
+        ${actionBtn(ICON_EDIT,'text-brand-600 bg-brand-50 hover:bg-brand-100','editKebijakan('+k.id+')','Edit')}
+        ${actionBtn(ICON_TRASH,'text-rose-600 bg-rose-50 hover:bg-rose-100','deleteKebijakan('+k.id+')','Hapus')}
+      </td>
+    </tr>`).join('') || `<tr><td colspan="6" class="py-10 text-center text-slate-400 text-sm">Tidak ada data ditemukan.</td></tr>`;
+  document.getElementById('kebijakanCount').textContent = `Menampilkan ${filtered.length} dari ${kebijakanData.length} data kebijakan`;
+}
+function openKebijakanModal(){
+  document.getElementById('formKebijakan').reset();
+  document.getElementById('kebijakanEditId').value = '';
+  document.getElementById('kebijakanModalTitle').textContent = 'Tambah Data Kebijakan';
+  document.getElementById('kebijakanKode').value = 'KBJ-' + String(kebijakanSeq).padStart(3,'0');
+  document.getElementById('kebijakanTahun').innerHTML = yearOptionsHTML(2026);
+  openModal('modal-kebijakan');
+}
+function editKebijakan(id){
+  const k = kebijakanData.find(x=>x.id===id);
+  document.getElementById('kebijakanEditId').value = id;
+  document.getElementById('kebijakanModalTitle').textContent = 'Edit Data Kebijakan';
+  document.getElementById('kebijakanKode').value = k.kode;
+  document.getElementById('kebijakanNama').value = k.nama;
+  document.getElementById('kebijakanTahun').innerHTML = yearOptionsHTML(k.tahun);
+  document.getElementById('kebijakanStatus').value = k.status;
+  document.getElementById('kebijakanPic').value = k.pic;
+  openModal('modal-kebijakan');
+}
+function saveKebijakan(e){
+  e.preventDefault();
+  const id = document.getElementById('kebijakanEditId').value;
+  const nama = document.getElementById('kebijakanNama').value.trim();
+  const tahun = parseInt(document.getElementById('kebijakanTahun').value);
+  const status = document.getElementById('kebijakanStatus').value;
+  const pic = document.getElementById('kebijakanPic').value;
+  if(id){
+    const k = kebijakanData.find(x=>x.id===parseInt(id));
+    Object.assign(k, {nama, tahun, status, pic});
+    logActivity(`Memperbarui data kebijakan ${k.kode}`, 'Data Kebijakan');
+    showToast('Data kebijakan berhasil diperbarui');
+  } else {
+    const kode = 'KBJ-' + String(kebijakanSeq).padStart(3,'0');
+    kebijakanData.push({id: kebijakanSeq, kode, nama, tahun, status, pic});
+    logActivity(`Menambahkan kebijakan baru ${kode}`, 'Data Kebijakan');
+    kebijakanSeq++;
+    showToast('Data kebijakan berhasil ditambahkan');
+  }
+  closeModal('modal-kebijakan');
+  renderKebijakanTable();
+  updateDashboard();
+}
+function deleteKebijakan(id){
+  const k = kebijakanData.find(x=>x.id===id);
+  document.getElementById('confirmIconWrap').className = 'w-14 h-14 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4';
+  document.getElementById('confirmTitle').textContent = 'Hapus Kebijakan?';
+  document.getElementById('confirmMessage').textContent = `Data "${k.nama}" (${k.kode}) akan dihapus permanen.`;
+  const btn = document.getElementById('confirmActionBtn');
+  btn.textContent = 'Ya, Hapus';
+  btn.className = 'px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-card transition';
+  pendingConfirmAction = function(){
+    kebijakanData = kebijakanData.filter(x=>x.id!==id);
+    closeModal('modal-confirm');
+    renderKebijakanTable();
+    updateDashboard();
+    logActivity(`Menghapus kebijakan ${k.kode}`, 'Data Kebijakan');
+    showToast('Data kebijakan berhasil dihapus', 'error');
+  };
+  openModal('modal-confirm');
+}
+
+/* =========================================================
+   RENDER: PROGRAM KERJA
+========================================================= */
+function renderProgramTable(){
+  const term = (document.getElementById('searchProgram').value || '').toLowerCase();
+  const filtered = programData.filter(p => p.nama.toLowerCase().includes(term) || p.kode.toLowerCase().includes(term));
+  const tbody = document.getElementById('programTableBody');
+  tbody.innerHTML = filtered.map(p => {
+    const k = kebijakanData.find(x=>x.id===p.kebijakanId);
+    return `
+    <tr>
+      <td class="py-3.5 px-5 font-mono text-xs font-semibold text-navy-700">${p.kode}</td>
+      <td class="py-3.5 px-5 font-medium text-slate-700">${p.nama}</td>
+      <td class="py-3.5 px-5 text-slate-500">${k ? k.kode+' &middot; '+k.nama : '<span class="text-slate-300">Tidak terkait</span>'}</td>
+      <td class="py-3.5 px-5 text-slate-500">${p.tahun}</td>
+      <td class="py-3.5 px-5">${statusBadge(p.status)}</td>
+      <td class="py-3.5 px-5 text-right space-x-1">
+        ${actionBtn(ICON_EDIT,'text-brand-600 bg-brand-50 hover:bg-brand-100','editProgram('+p.id+')','Edit')}
+        ${actionBtn(ICON_TRASH,'text-rose-600 bg-rose-50 hover:bg-rose-100','deleteProgram('+p.id+')','Hapus')}
+      </td>
+    </tr>`; }).join('') || `<tr><td colspan="6" class="py-10 text-center text-slate-400 text-sm">Tidak ada data ditemukan.</td></tr>`;
+  document.getElementById('programCount').textContent = `Menampilkan ${filtered.length} dari ${programData.length} program kerja`;
+}
+function populateKebijakanOptions(selectedId){
+  const sel = document.getElementById('programKebijakan');
+  sel.innerHTML = kebijakanData.map(k=>`<option value="${k.id}" ${k.id===selectedId?'selected':''}>${k.kode} &middot; ${k.nama}</option>`).join('');
+}
+function openProgramModal(){
+  document.getElementById('formProgram').reset();
+  document.getElementById('programEditId').value = '';
+  document.getElementById('programModalTitle').textContent = 'Tambah Program Kerja';
+  document.getElementById('programKode').value = 'PRG-' + String(programSeq).padStart(3,'0');
+  document.getElementById('programTahun').innerHTML = yearOptionsHTML(2026);
+  populateKebijakanOptions(kebijakanData[0] ? kebijakanData[0].id : null);
+  openModal('modal-program');
+}
+function editProgram(id){
+  const p = programData.find(x=>x.id===id);
+  document.getElementById('programEditId').value = id;
+  document.getElementById('programModalTitle').textContent = 'Edit Program Kerja';
+  document.getElementById('programKode').value = p.kode;
+  document.getElementById('programNama').value = p.nama;
+  document.getElementById('programTahun').innerHTML = yearOptionsHTML(p.tahun);
+  populateKebijakanOptions(p.kebijakanId);
+  document.getElementById('programStatus').value = p.status;
+  openModal('modal-program');
+}
+function saveProgram(e){
+  e.preventDefault();
+  const id = document.getElementById('programEditId').value;
+  const nama = document.getElementById('programNama').value.trim();
+  const kebijakanId = parseInt(document.getElementById('programKebijakan').value);
+  const tahun = parseInt(document.getElementById('programTahun').value);
+  const status = document.getElementById('programStatus').value;
+  if(id){
+    const p = programData.find(x=>x.id===parseInt(id));
+    Object.assign(p, {nama, kebijakanId, tahun, status});
+    logActivity(`Memperbarui program kerja ${p.kode}`, 'Program Kerja');
+    showToast('Program kerja berhasil diperbarui');
+  } else {
+    const kode = 'PRG-' + String(programSeq).padStart(3,'0');
+    programData.push({id: programSeq, kode, nama, kebijakanId, tahun, status});
+    logActivity(`Menambahkan program kerja baru ${kode}`, 'Program Kerja');
+    programSeq++;
+    showToast('Program kerja berhasil ditambahkan');
+  }
+  closeModal('modal-program');
+  renderProgramTable();
+  updateDashboard();
+}
+function deleteProgram(id){
+  const p = programData.find(x=>x.id===id);
+  document.getElementById('confirmIconWrap').className = 'w-14 h-14 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4';
+  document.getElementById('confirmTitle').textContent = 'Hapus Program Kerja?';
+  document.getElementById('confirmMessage').textContent = `Data "${p.nama}" (${p.kode}) akan dihapus permanen.`;
+  const btn = document.getElementById('confirmActionBtn');
+  btn.textContent = 'Ya, Hapus';
+  btn.className = 'px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-card transition';
+  pendingConfirmAction = function(){
+    programData = programData.filter(x=>x.id!==id);
+    closeModal('modal-confirm');
+    renderProgramTable();
+    updateDashboard();
+    logActivity(`Menghapus program kerja ${p.kode}`, 'Program Kerja');
+    showToast('Program kerja berhasil dihapus', 'error');
+  };
+  openModal('modal-confirm');
+}
+
+/* =========================================================
+   RENDER: PERIODE EVALUASI
+========================================================= */
+function renderPeriodeTable(){
+  const sorted = [...periodeData].sort((a,b)=> a.tahun - b.tahun || a.semester - b.semester);
+  const tbody = document.getElementById('periodeTableBody');
+  tbody.innerHTML = sorted.map(p => `
+    <tr>
+      <td class="py-3.5 px-5 font-semibold text-slate-700">${p.tahun}</td>
+      <td class="py-3.5 px-5 text-slate-500">Semester ${p.semester}</td>
+      <td class="py-3.5 px-5 text-slate-500">${formatTanggal(p.mulai)}</td>
+      <td class="py-3.5 px-5 text-slate-500">${formatTanggal(p.selesai)}</td>
+      <td class="py-3.5 px-5">${statusBadge(p.status)}</td>
+      <td class="py-3.5 px-5 text-right space-x-1">
+        ${actionBtn(ICON_EDIT,'text-brand-600 bg-brand-50 hover:bg-brand-100','editPeriode('+p.id+')','Edit')}
+        ${actionBtn(ICON_TRASH,'text-rose-600 bg-rose-50 hover:bg-rose-100','deletePeriode('+p.id+')','Hapus')}
+      </td>
+    </tr>`).join('') || `<tr><td colspan="6" class="py-10 text-center text-slate-400 text-sm">Belum ada periode evaluasi.</td></tr>`;
+  document.getElementById('periodeCount').textContent = `Menampilkan ${periodeData.length} periode evaluasi`;
+}
+function openPeriodeModal(){
+  document.getElementById('formPeriode').reset();
+  document.getElementById('periodeEditId').value = '';
+  document.getElementById('periodeModalTitle').textContent = 'Tambah Periode Evaluasi';
+  document.getElementById('periodeTahun').innerHTML = yearOptionsHTML(2026);
+  openModal('modal-periode');
+}
+function editPeriode(id){
+  const p = periodeData.find(x=>x.id===id);
+  document.getElementById('periodeEditId').value = id;
+  document.getElementById('periodeModalTitle').textContent = 'Edit Periode Evaluasi';
+  document.getElementById('periodeTahun').innerHTML = yearOptionsHTML(p.tahun);
+  document.getElementById('periodeSemester').value = p.semester;
+  document.getElementById('periodeMulai').value = p.mulai;
+  document.getElementById('periodeSelesai').value = p.selesai;
+  document.getElementById('periodeStatus').value = p.status;
+  openModal('modal-periode');
+}
+function savePeriode(e){
+  e.preventDefault();
+  const id = document.getElementById('periodeEditId').value;
+  const tahun = parseInt(document.getElementById('periodeTahun').value);
+  const semester = parseInt(document.getElementById('periodeSemester').value);
+  const mulai = document.getElementById('periodeMulai').value;
+  const selesai = document.getElementById('periodeSelesai').value;
+  const status = document.getElementById('periodeStatus').value;
+  if(id){
+    const p = periodeData.find(x=>x.id===parseInt(id));
+    Object.assign(p, {tahun, semester, mulai, selesai, status});
+    logActivity(`Memperbarui periode evaluasi ${tahun} semester ${semester}`, 'Periode Evaluasi');
+    showToast('Periode evaluasi berhasil diperbarui');
+  } else {
+    periodeData.push({id: periodeSeq++, tahun, semester, mulai, selesai, status});
+    logActivity(`Menambahkan periode evaluasi ${tahun} semester ${semester}`, 'Periode Evaluasi');
+    showToast('Periode evaluasi berhasil ditambahkan');
+  }
+  closeModal('modal-periode');
+  renderPeriodeTable();
+  updateDashboard();
+}
+function deletePeriode(id){
+  const p = periodeData.find(x=>x.id===id);
+  document.getElementById('confirmIconWrap').className = 'w-14 h-14 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4';
+  document.getElementById('confirmTitle').textContent = 'Hapus Periode Evaluasi?';
+  document.getElementById('confirmMessage').textContent = `Periode ${p.tahun} Semester ${p.semester} akan dihapus permanen.`;
+  const btn = document.getElementById('confirmActionBtn');
+  btn.textContent = 'Ya, Hapus';
+  btn.className = 'px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-card transition';
+  pendingConfirmAction = function(){
+    periodeData = periodeData.filter(x=>x.id!==id);
+    closeModal('modal-confirm');
+    renderPeriodeTable();
+    updateDashboard();
+    logActivity(`Menghapus periode evaluasi ${p.tahun} semester ${p.semester}`, 'Periode Evaluasi');
+    showToast('Periode evaluasi berhasil dihapus', 'error');
+  };
+  openModal('modal-confirm');
+}
+
+/* =========================================================
+   RENDER: MANAJEMEN PENGGUNA
+========================================================= */
+function renderPenggunaTable(){
+  const term = (document.getElementById('searchPengguna').value || '').toLowerCase();
+  const filtered = penggunaData.filter(u => u.nama.toLowerCase().includes(term) || u.email.toLowerCase().includes(term) || u.role.toLowerCase().includes(term));
+  const tbody = document.getElementById('penggunaTableBody');
+  tbody.innerHTML = filtered.map(u => `
+    <tr>
+      <td class="py-3.5 px-5">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-slate-100 text-navy-700 text-xs font-bold flex items-center justify-center shrink-0">${initials(u.nama)}</div>
+          <span class="font-medium text-slate-700">${u.nama}</span>
+        </div>
+      </td>
+      <td class="py-3.5 px-5 text-slate-500">${u.email}</td>
+      <td class="py-3.5 px-5 text-slate-500">${u.role}</td>
+      <td class="py-3.5 px-5">${statusBadge(u.status)}</td>
+      <td class="py-3.5 px-5 text-right space-x-1">
+        ${actionBtn(ICON_EDIT,'text-brand-600 bg-brand-50 hover:bg-brand-100','editPengguna('+u.id+')','Edit')}
+        ${actionBtn(ICON_TOGGLE, u.status==='Aktif' ? 'text-amber-600 bg-amber-50 hover:bg-amber-100' : 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100','toggleStatusPengguna('+u.id+')', u.status==='Aktif' ? 'Nonaktifkan' : 'Aktifkan')}
+        ${actionBtn(ICON_TRASH,'text-rose-600 bg-rose-50 hover:bg-rose-100','deletePengguna('+u.id+')','Hapus')}
+      </td>
+    </tr>`).join('') || `<tr><td colspan="5" class="py-10 text-center text-slate-400 text-sm">Tidak ada pengguna ditemukan.</td></tr>`;
+  document.getElementById('penggunaCount').textContent = `Menampilkan ${filtered.length} dari ${penggunaData.length} pengguna`;
+}
+function openPenggunaModal(){
+  document.getElementById('formPengguna').reset();
+  document.getElementById('penggunaEditId').value = '';
+  document.getElementById('penggunaModalTitle').textContent = 'Tambah Pengguna';
+  openModal('modal-pengguna');
+}
+function editPengguna(id){
+  const u = penggunaData.find(x=>x.id===id);
+  document.getElementById('penggunaEditId').value = id;
+  document.getElementById('penggunaModalTitle').textContent = 'Edit Pengguna';
+  document.getElementById('penggunaNama').value = u.nama;
+  document.getElementById('penggunaEmail').value = u.email;
+  document.getElementById('penggunaRole').value = u.role;
+  document.getElementById('penggunaStatus').value = u.status;
+  openModal('modal-pengguna');
+}
+function savePengguna(e){
+  e.preventDefault();
+  const id = document.getElementById('penggunaEditId').value;
+  const nama = document.getElementById('penggunaNama').value.trim();
+  const email = document.getElementById('penggunaEmail').value.trim();
+  const role = document.getElementById('penggunaRole').value;
+  const status = document.getElementById('penggunaStatus').value;
+  if(id){
+    const u = penggunaData.find(x=>x.id===parseInt(id));
+    Object.assign(u, {nama, email, role, status});
+    logActivity(`Memperbarui data pengguna ${u.nama}`, 'Manajemen Pengguna');
+    showToast('Data pengguna berhasil diperbarui');
+  } else {
+    penggunaData.push({id: penggunaSeq++, nama, email, role, status});
+    logActivity(`Menambahkan pengguna baru ${nama}`, 'Manajemen Pengguna');
+    showToast('Pengguna berhasil ditambahkan');
+  }
+  closeModal('modal-pengguna');
+  renderPenggunaTable();
+  updateDashboard();
+}
+function toggleStatusPengguna(id){
+  const u = penggunaData.find(x=>x.id===id);
+  const newStatus = u.status==='Aktif' ? 'Nonaktif' : 'Aktif';
+  document.getElementById('confirmIconWrap').className = 'w-14 h-14 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4';
+  document.getElementById('confirmTitle').textContent = (newStatus==='Nonaktif' ? 'Nonaktifkan' : 'Aktifkan') + ' Pengguna?';
+  document.getElementById('confirmMessage').textContent = `Akun "${u.nama}" akan diubah menjadi ${newStatus}.`;
+  const btn = document.getElementById('confirmActionBtn');
+  btn.textContent = 'Ya, Lanjutkan';
+  btn.className = 'px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-amber-600 hover:bg-amber-700 shadow-card transition';
+  pendingConfirmAction = function(){
+    u.status = newStatus;
+    closeModal('modal-confirm');
+    renderPenggunaTable();
+    logActivity(`Mengubah status pengguna ${u.nama} menjadi ${newStatus}`, 'Manajemen Pengguna');
+    showToast(`Pengguna berhasil di${newStatus==='Nonaktif'?'nonaktifkan':'aktifkan'}`);
+  };
+  openModal('modal-confirm');
+}
+function deletePengguna(id){
+  const u = penggunaData.find(x=>x.id===id);
+  document.getElementById('confirmIconWrap').className = 'w-14 h-14 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4';
+  document.getElementById('confirmTitle').textContent = 'Hapus Pengguna?';
+  document.getElementById('confirmMessage').textContent = `Akun "${u.nama}" akan dihapus permanen dari sistem.`;
+  const btn = document.getElementById('confirmActionBtn');
+  btn.textContent = 'Ya, Hapus';
+  btn.className = 'px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-card transition';
+  pendingConfirmAction = function(){
+    penggunaData = penggunaData.filter(x=>x.id!==id);
+    closeModal('modal-confirm');
+    renderPenggunaTable();
+    updateDashboard();
+    logActivity(`Menghapus pengguna ${u.nama}`, 'Manajemen Pengguna');
+    showToast('Pengguna berhasil dihapus', 'error');
+  };
+  openModal('modal-confirm');
+}
+
+/* =========================================================
+   ACTIVITY TABLE
+========================================================= */
+function moduleDotColor(modul){
+  switch(modul){
+    case 'Data Kebijakan': return 'bg-brand-500';
+    case 'Program Kerja': return 'bg-gold-500';
+    case 'Periode Evaluasi': return 'bg-emerald-500';
+    case 'Manajemen Pengguna': return 'bg-navy-700';
+    default: return 'bg-slate-400';
+  }
+}
+function renderActivityTable(){
+  const tbody = document.getElementById('activityTableBody');
+  tbody.innerHTML = activityLog.slice(0,10).map(a => `
+    <tr>
+      <td class="py-3 pr-4 text-slate-400 whitespace-nowrap">${a.waktu}</td>
+      <td class="py-3 pr-4 font-medium text-slate-700 whitespace-nowrap">${a.user}</td>
+      <td class="py-3 pr-4 text-slate-600">${a.aksi}</td>
+      <td class="py-3 pr-4"><span class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500"><span class="w-1.5 h-1.5 rounded-full ${moduleDotColor(a.modul)}"></span>${a.modul}</span></td>
+    </tr>`).join('');
+}
+
+/* =========================================================
+   DASHBOARD: STATS + CHARTS
+========================================================= */
+function updateDashboard(){
+  document.getElementById('statKebijakan').textContent = kebijakanData.filter(k=>k.status==='Berjalan').length;
+  document.getElementById('statProgram').textContent = programData.length;
+  document.getElementById('statPeriode').textContent = periodeData.length;
+  document.getElementById('statPengguna').textContent = penggunaData.length;
+  renderActivityTable();
+  renderCharts();
+}
+function renderCharts(){
+  const years = [2021,2022,2023,2024,2025,2026];
+  const counts = years.map(y => kebijakanData.filter(k=>k.tahun===y).length);
+
+  const statuses = ['Berjalan','Selesai','Tertunda','Dibatalkan'];
+  const statusCounts = statuses.map(s => kebijakanData.filter(k=>k.status===s).length);
+  const statusColors = ['#2563EB','#10B981','#D97706','#E11D48'];
+
+  if(chartYearInstance){
+    chartYearInstance.data.datasets[0].data = counts;
+    chartYearInstance.update();
+  } else {
+    chartYearInstance = new Chart(document.getElementById('chartYear'), {
+      type: 'bar',
+      data: { labels: years, datasets: [{ label:'Jumlah Kebijakan', data: counts, backgroundColor:'#2563EB', borderRadius:8, maxBarThickness:42 }] },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#0B2545', padding:10, cornerRadius:8 } },
+        scales:{ y:{ beginAtZero:true, ticks:{precision:0, color:'#94A3B8'}, grid:{color:'#F1F5F9'} },
+                 x:{ ticks:{color:'#64748B'}, grid:{display:false} } }
+      }
+    });
+  }
+
+  if(chartStatusInstance){
+    chartStatusInstance.data.datasets[0].data = statusCounts;
+    chartStatusInstance.update();
+  } else {
+    chartStatusInstance = new Chart(document.getElementById('chartStatus'), {
+      type: 'doughnut',
+      data: { labels: statuses, datasets: [{ data: statusCounts, backgroundColor: statusColors, borderWidth:3, borderColor:'#fff' }] },
+      options: {
+        responsive:true, maintainAspectRatio:false, cutout:'62%',
+        plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, boxHeight:10, usePointStyle:true, pointStyle:'circle', color:'#475569', font:{size:11.5} } },
+                  tooltip:{ backgroundColor:'#0B2545', padding:10, cornerRadius:8 } }
+      }
+    });
+  }
+}
+
+/* =========================================================
+   INIT
+========================================================= */
+function renderAll(){
+  renderKebijakanTable();
+  renderProgramTable();
+  renderPeriodeTable();
+  renderPenggunaTable();
+  updateDashboard();
+}
+window.addEventListener('resize', ()=>{ if(window.innerWidth>=1024){ document.getElementById('sidebar').classList.remove('-translate-x-full'); document.getElementById('sidebarOverlay').classList.add('hidden'); } });
+</script>
+
+</body>
+</html>
